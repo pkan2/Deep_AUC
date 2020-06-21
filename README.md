@@ -31,3 +31,6 @@ url={https://openreview.net/forum?id=HJepXaVYDr}
 }
 ```
 
+## Explanation for the Forked File:
+This forked repository contains files modified from the original repository to be compatible with running Tensorflow 2.0. The modification is reserved by pkan2. 
+

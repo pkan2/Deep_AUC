@@ -25,7 +25,7 @@ def PPD_SG(objective, eta, W, W0, a,b, a0, b0, alpha, gamma):
     
     grad_alpha = tf.gradients(objective, alpha)[0]
     
-    update_ops_bn = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    update_ops_bn = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops_bn):
         
         for p, p0, g in zip(V, V0, grad_v):
@@ -57,8 +57,8 @@ def PPD_ADAGRAD(objective, stage_idx, T0, eta, W, W0, a, b, a0, b0, alpha, gamma
     max_i = tf.Variable(0, dtype=tf.float32, name='max_i')
     sum_gt = tf.Variable(0, dtype=tf.float32, name='sum_gt')
       
-    update_ops_bn = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-    with tf.control_dependencies(update_ops_bn):
+    update_ops_bn = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)
+    with tf.compat.v1.control_dependencies(update_ops_bn):
       
       count = 0
       for p, g, a, g_a, p0 in zip(V, grad_v, accumulators, grad_accumulators, V0):

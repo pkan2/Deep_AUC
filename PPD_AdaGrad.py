@@ -8,30 +8,36 @@ import cifar_input as cifar_data
 import my_utils
 import optimizer as opt
 
+tf.compat.v1.disable_eager_execution()
 
-tf.reset_default_graph()
-FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('model', 'resnet', '''which model to train: resnet or convnet''')
-tf.app.flags.DEFINE_string('activation', 'elu', '''activation function to use: relu or elu''')
-tf.app.flags.DEFINE_integer('K', 1000, '''Number of stages''')
-tf.app.flags.DEFINE_integer('random_seed', 123, '''random seed for initialization''')
-tf.app.flags.DEFINE_integer('train_batch_size', 128, '''batch_size''')
-tf.app.flags.DEFINE_integer('t0', 200, '''T0 for stagewise training''')
-tf.app.flags.DEFINE_float('lr', 0.1, '''learning rate to train the models''')
-tf.app.flags.DEFINE_integer('split_index', 4, '''index where to partition the dataset''')
-tf.app.flags.DEFINE_float('keep_index', 0.1, '''portion of data to keep ''')
-tf.app.flags.DEFINE_integer('dataset', 10, '''dataset to evalute: 10 or 100 or 2''')
-tf.app.flags.DEFINE_integer('resnet_layers', 20, '''number of layers to use in ResNet: 56 or 20; if convnet, make it to 3''')
-tf.app.flags.DEFINE_boolean('use_avg', False, '''if True, use avg to evaluate''')
-tf.app.flags.DEFINE_boolean('is_tune', False, '''if True, split train dataset (50K) into 45K, 5K as train/validation data''')
-tf.app.flags.DEFINE_boolean('is_crop_flip', False, '''if True, make train_data random_crop_flip''')
-tf.app.flags.DEFINE_boolean('use_L2', False, '''whether to use L2 regularizer''')
+#tf.reset_default_graph()
+tf.compat.v1.reset_default_graph()
+#FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.flags.FLAGS
+
+tf.compat.v1.flags.DEFINE_string('model', 'resnet', '''which model to train: resnet or convnet''')
+tf.compat.v1.flags.DEFINE_string('activation', 'elu', '''activation function to use: relu or elu''')
+tf.compat.v1.flags.DEFINE_integer('K', 1000, '''Number of stages''')
+tf.compat.v1.flags.DEFINE_integer('random_seed', 123, '''random seed for initialization''')
+tf.compat.v1.flags.DEFINE_integer('train_batch_size', 128, '''batch_size''')
+tf.compat.v1.flags.DEFINE_integer('t0', 200, '''T0 for stagewise training''')
+tf.compat.v1.flags.DEFINE_float('lr', 0.1, '''learning rate to train the models''')
+tf.compat.v1.flags.DEFINE_integer('split_index', 4, '''index where to partition the dataset''')
+tf.compat.v1.flags.DEFINE_float('keep_index', 0.1, '''portion of data to keep ''')
+tf.compat.v1.flags.DEFINE_integer('dataset', 10, '''dataset to evalute: 10 or 100 or 2''')
+tf.compat.v1.flags.DEFINE_integer('resnet_layers', 20, '''number of layers to use in ResNet: 56 or 20; if convnet, make it to 3''')
+tf.compat.v1.flags.DEFINE_boolean('use_avg', False, '''if True, use avg to evaluate''')
+tf.compat.v1.flags.DEFINE_boolean('is_tune', False, '''if True, split train dataset (50K) into 45K, 5K as train/validation data''')
+tf.compat.v1.flags.DEFINE_boolean('is_crop_flip', False, '''if True, make train_data random_crop_flip''')
+tf.compat.v1.flags.DEFINE_boolean('use_L2', False, '''whether to use L2 regularizer''')
 
 
-tf.set_random_seed(FLAGS.random_seed)
+#tf.set_random_seed(FLAGS.random_seed)
+tf.compat.v1.set_random_seed(FLAGS.random_seed)
 
 # Import CIFAR data
-if FLAGS.dataset != 2 and FLAGS.is_stl10 == False:
+#if FLAGS.dataset != 2 and FLAGS.is_stl10 == False:
+if FLAGS.dataset == 10:
     (train_data, train_labels), (test_data, test_labels) = cifar_data.load_data(FLAGS.dataset, FLAGS.is_tune, FLAGS.is_crop_flip)
     split_index = FLAGS.split_index if FLAGS.dataset==10 else FLAGS.split_index
     train_labels[train_labels<=split_index] = -1 # [0, ....]
@@ -69,37 +75,37 @@ factor = 9
 
 img_size = train_data.shape[1]
 channel_size = train_data.shape[-1]
-X = tf.placeholder(tf.float32, [batch_size, img_size, img_size, channel_size])
-Y = tf.placeholder(tf.float32, [batch_size, 1])
-phase_train = tf.placeholder(tf.bool, name='phase_train')
+X = tf.compat.v1.placeholder(tf.float32, [batch_size, img_size, img_size, channel_size])
+Y = tf.compat.v1.placeholder(tf.float32, [batch_size, 1])
+phase_train = tf.compat.v1.placeholder(tf.bool, name='phase_train')
 
 logits = inference(X, num_classes=2, num_layers=FLAGS.resnet_layers, activations=FLAGS.activation, phase_train=phase_train) # when resnet you need to pass number of layers 
 pred_score = tf.nn.softmax(logits)
 
 
-W = [var for var in tf.trainable_variables ()]
+W = [var for var in tf.compat.v1.trainable_variables ()]
 a = tf.Variable([0], dtype=tf.float32, name='a') 
 b = tf.Variable([0], dtype=tf.float32, name='b') 
 alpha = tf.Variable([0], dtype=tf.float32, name='alpha')
 
 # placeholders
-p = tf.placeholder(tf.float32, shape=(1,))
-p_hat = tf.placeholder(tf.float32, shape=(1,))
-P_hat = tf.placeholder(tf.float32, shape=(1,))
-W0 = [tf.placeholder(tf.float32, shape=w.get_shape().as_list()) for w in W]
-a0 = tf.placeholder(tf.float32, shape=(1,), name='a0') 
-b0 = tf.placeholder(tf.float32, shape=(1,), name='b0') 
-eta = tf.placeholder(tf.float32, shape=(1,))
+p = tf.compat.v1.placeholder(tf.float32, shape=(1,))
+p_hat = tf.compat.v1.placeholder(tf.float32, shape=(1,))
+P_hat = tf.compat.v1.placeholder(tf.float32, shape=(1,))
+W0 = [tf.compat.v1.placeholder(tf.float32, shape=w.get_shape().as_list()) for w in W]
+a0 = tf.compat.v1.placeholder(tf.float32, shape=(1,), name='a0')
+b0 = tf.compat.v1.placeholder(tf.float32, shape=(1,), name='b0')
+eta = tf.compat.v1.placeholder(tf.float32, shape=(1,))
 # gamma needs to be given 
 gamma = tf.Variable(gamma_, dtype=tf.float32, name='gamma')
-stage_idx = tf.placeholder(tf.float32)
+stage_idx = tf.compat.v1.placeholder(tf.float32)
 
 # objective function 
 objective = opt.objective_function_batch(pred_score, a, b, alpha, p_hat, P_hat, Y) 
 train_op, return_value, accumulators, grad_accumulators, max_, sum_, M_s = opt.PPD_ADAGRAD(objective, stage_idx, T0, eta, W, W0, a, b, a0, b0, alpha, gamma, factor=factor)
 
 # init
-init = tf.global_variables_initializer()
+init = tf.compat.v1.global_variables_initializer()
 
 # shuffle data 
 train_ids = list(range(train_data.shape[0]))
@@ -113,9 +119,8 @@ total_iter = 0
 num_batch = train_labels.shape[0]//batch_size
 
 # Start training
-with tf.Session() as sess:  
-    sess = tf.Session()
-
+with tf.compat.v1.Session() as sess:
+    
 
     sess.run(init)
     print ('\nStart training...')
@@ -129,7 +134,7 @@ with tf.Session() as sess:
     a_avg_acc = 0
     b_avg_acc = 0
     
-    assign_W = [tf.placeholder(tf.float32, w.get_shape().as_list()) for w in W]
+    assign_W = [tf.compat.v1.placeholder(tf.float32, w.get_shape().as_list()) for w in W]
     update_W_ops = [var.assign(assign_W[idx]) for idx, var in enumerate(W) if len(var.get_shape().as_list()) != 1] 
 
     for k in range(1, FLAGS.K+1):
