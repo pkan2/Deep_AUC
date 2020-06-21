@@ -14,7 +14,12 @@ Tensorflow>=1.10.0
 
 ### Run
 ```
-python PPD_SG.py/PPD_AdaGrad.py --dataset=10 --train_batch_size=128 --use_L2=False --split_index=4 --lr=0.01 --keep_index=0.1 --t0=200
+python PPD_SG.py --dataset=10 --train_batch_size=128 --use_L2=False --split_index=4 --lr=0.01 --keep_index=0.1 --t0=200
+```
+or 
+```
+python PPD_AdaGrad.py --dataset=10 --train_batch_size=128 --use_L2=False --split_index=4 --lr=0.01 --keep_index=0.1 --t0=200
+
 ```
 
 ## Bibtex 
